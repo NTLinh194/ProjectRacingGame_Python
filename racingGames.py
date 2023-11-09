@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 import random
+import button 
+
 pygame.init()
 # color 
 gray = (100, 100, 100)
@@ -9,31 +11,48 @@ yellow = (255, 232, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
 # tao cua so game
-width= 500
+width= 700
 height = 500
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
+#screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption('Racing Games')
+# khoi tao menu
+# load menu button images
+button_images_name = ['button_resume.png','button_options.png', 'button_quit.png']
+number_of_button=len(button_images_name)
+buttons = []
+for button_number,name in enumerate (button_images_name):
+    image = pygame.image.load('images/' + name)
+    button_temp = button.Button((width-image.get_width())/2, (height/number_of_button)*(button_number+0.5)-image.get_height()/2, image, 1)
+    buttons.append(button_temp)
+#load game over button
+yes_img=pygame.image.load('images/yes_btn.png').convert_alpha()
+no_img=pygame.image.load('images/yes_btn.png').convert_alpha()
+yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/4*3.0,yes_img,1)
+no_button=button.Button((width-yes_img.get_width())/2*1.5,(height-yes_img.get_height())/4*3.0,yes_img,1)
+#yes_button=button.Button(0,0,yes_img,1)
 # khoi tao bien
 gameOver = False
-speed = 2
+speed = 5
 score = 0
+number_of_road = 5
 # duong xe chay
-road_width = 300
+road_width = number_of_road*100
 street_width = 10
 street_height = 50
 # lan duong xe chay
-lane_left = 150
-land_center = 250
-lane_right = 350
+lane_left = width/2-100
+land_center = width/2
+lane_right = width/2+100
 lanes = [lane_left, land_center, lane_right]
 lane_move_y = 0
 # road and edge
-road = (100, 0 , road_width, height)
-left_edge = (95, 0, street_width, height)
-right_edge = (395, 0, street_width, height)
+road = (width/2-150, 0 , road_width, height)
+left_edge = (width/2-155, 0, street_width, height)
+right_edge = (width/2+145, 0, street_width, height)
 # vi tri ban dau xe ng choi
-player_x = 250
+player_x = width/2
 player_y = 400
 # doi tuong xe luu thong
 class vehicle(pygame.sprite.Sprite):
@@ -71,8 +90,29 @@ crash_rect = crash.get_rect()
 # cai dat fps
 clock = pygame.time.Clock()
 fps = 120
-# vong lap xu ly game
+waiting=True
 running = True
+#vòng lặp menu bắt đầu
+while waiting:
+    screen.fill(green)
+    if buttons[0].draw(screen):
+        waiting = False
+    if buttons[1].draw(screen):
+        print("Option menu")
+    if buttons[2].draw(screen):
+        waiting = False
+        running = False
+    for event in pygame.event.get():
+        if event.type == QUIT:
+            waiting = False
+            running = False
+        if event.type == KEYDOWN:
+            if event.key == K_RETURN:
+                waiting=False
+
+    pygame.display.update()
+# vong lap xu ly game
+
 while running:
     # chinh frame hinh tren giay
     clock.tick(fps)
@@ -148,11 +188,24 @@ while running:
         text_rect = text.get_rect()
         text_rect.center = (width/2, 100)
         screen.blit(text, text_rect)
+        yes_button.draw(screen)
+        no_button.draw(screen)
  
     pygame.display.update()
 
     while gameOver:
         clock.tick(fps)
+        #nút yes
+        if yes_button.draw(screen):
+            # reset game
+            gameOver = False
+            score = 0
+            speed = 2
+            vehicle_group.empty()
+            player.rect.center = [player_x, player_y]
+        if no_button.draw(screen):
+            gameOver = False
+            running = False
         for event in pygame.event.get():
             if event.type == QUIT:
                 gameOver = False
