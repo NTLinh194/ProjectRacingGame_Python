@@ -12,14 +12,14 @@ red = (200, 0, 0)
 white = (255, 255, 255)
 # tao cua so game
 width= 700
-height = 500
+height = 600
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption('Racing Games')
 # khoi tao menu
 # load menu button images
-button_images_name = ['button_resume.png','button_options.png', 'button_quit.png']
+button_images_name = ['button_resume.png','button_quit.png']
 number_of_button=len(button_images_name)
 buttons = []
 for button_number,name in enumerate (button_images_name):
@@ -27,16 +27,16 @@ for button_number,name in enumerate (button_images_name):
     button_temp = button.Button((width-image.get_width())/2, (height/number_of_button)*(button_number+0.5)-image.get_height()/2, image, 1)
     buttons.append(button_temp)
 #load game over button
-yes_img=pygame.image.load('images/yes_btn.png').convert_alpha()
-no_img=pygame.image.load('images/yes_btn.png').convert_alpha()
+yes_img=pygame.image.load('images/button_yes.png').convert_alpha()
+no_img=pygame.image.load('images/button_no.png').convert_alpha()
 yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/4*3.0,yes_img,1)
-no_button=button.Button((width-yes_img.get_width())/2*1.5,(height-yes_img.get_height())/4*3.0,yes_img,1)
+no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/4*3.0,no_img,1)
 #yes_button=button.Button(0,0,yes_img,1)
 # khoi tao bien
 gameOver = False
-speed = 5
+speed = 3
 score = 0
-number_of_road = 5
+number_of_road = 3
 # duong xe chay
 road_width = number_of_road*100
 street_width = 10
@@ -98,8 +98,6 @@ while waiting:
     if buttons[0].draw(screen):
         waiting = False
     if buttons[1].draw(screen):
-        print("Option menu")
-    if buttons[2].draw(screen):
         waiting = False
         running = False
     for event in pygame.event.get():
@@ -216,7 +214,7 @@ while running:
                     # reset game
                     gameOver = False
                     score = 0
-                    speed = 2
+                    speed = 3
                     vehicle_group.empty()
                     player.rect.center = [player_x, player_y]
                 elif event.key == K_n:
