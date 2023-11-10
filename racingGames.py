@@ -37,7 +37,7 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 gameOver = False
 speed = 6
 score = 0
-number_of_lane = 5
+number_of_lane = 6
 # duong xe chay
 road_width = number_of_lane*100
 street_width = 10
@@ -46,7 +46,6 @@ street_height = 50
 lanes = []
 for i in range (number_of_lane):
     lanes.append(width/2-(number_of_lane/2)*100+i*100+50)
-print(lanes)
 lane_move_y = 0
 # road and edge
 road = (lanes[0]-50, 0 , road_width, height)
