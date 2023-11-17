@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import random
 import button 
+import save_score
 
 pygame.init()
 # color 
@@ -12,7 +13,7 @@ red = (200, 0, 0)
 white = (255, 255, 255)
 # tao cua so game
 width= 700
-height = 600
+height = 800
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -53,7 +54,7 @@ left_edge = (width/2-155, 0, street_width, height)
 right_edge = (width/2+145, 0, street_width, height)
 # vi tri ban dau xe ng choi
 player_x = width/2
-player_y = 400
+player_y = 700
 # doi tuong xe luu thong
 class vehicle(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -73,6 +74,7 @@ class PlayerVehicle(vehicle):
 # sprite groups
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
+tree_group = pygame.sprite.Group()
 # tao xe ng choi
 player = PlayerVehicle(player_x, player_y)
 player_group.add(player)
@@ -85,7 +87,27 @@ for name in image_name:
 # load hinh va cham
 crash = pygame.image.load('images/crash.png')
 crash_rect = crash.get_rect()
-
+# area of tree
+area_trees=[25,50,75,100,125,150,width-150,width-125,width-100,width-75,width-50,width-25]
+area_of_tree_left = (0, 0 , 150, height)
+area_of_tree_right = (width-150, 0 , 150, height)
+# doi tuong cay
+class tree(pygame.sprite.Sprite):
+    def __init__(self, image, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        # scale img
+        image_scale = 80 / image.get_rect().width
+        new_width = image.get_rect().width * image_scale
+        new_height = image.get_rect().height * image_scale
+        self.image = pygame.transform.scale(image, (new_width, new_height))
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+# create ramdon tree
+tree_images_name=['tree 1.png', 'tree 2.png', 'tree 3.png']
+trees_image=[]
+for i in tree_images_name:
+    image = pygame.image.load('images/' + i)
+    trees_image.append(image)
 
 # cai dat fps
 clock = pygame.time.Clock()
@@ -136,6 +158,9 @@ while running:
     screen.fill(green)
     # ve road 
     pygame.draw.rect(screen, gray, road)
+    # draw area_of_tree
+    pygame.draw.rect(screen,green,area_of_tree_left)
+    pygame.draw.rect(screen,green,area_of_tree_right)   
     # ve edge - hanh lang duong
     pygame.draw.rect(screen, yellow, left_edge)
     pygame.draw.rect(screen, yellow, right_edge)
@@ -168,9 +193,27 @@ while running:
             score += 1
             # tang toc do chay
             if score > 0 and score % 5 == 0:
-                speed += 1
+                speed += 0.5
     # ve nhom xe luu thong
     vehicle_group.draw(screen)
+     # draw tree
+    if len(tree_group) < 20:
+        add_tree = True
+        for i in tree_group:
+            if i.rect.top < i.rect.height * 1.5:
+                add_tree = False
+        if add_tree:
+            area_tree = random.choice(area_trees)
+            image = random.choice(trees_image)
+            trees = tree(image, area_tree, -100)
+            tree_group.add(trees)
+    # move tree
+    for trees in tree_group:
+        trees.rect.y += speed
+        # remove the tree
+        if trees.rect.top >= height:
+            trees.kill()
+    tree_group.draw(screen)
     # hien thi diem
     font = pygame.font.Font(pygame.font.get_default_font(), 16)
     text = font.render(f'Score: {score}', True, white)
@@ -188,6 +231,7 @@ while running:
         screen.blit(text, text_rect)
         yes_button.draw(screen)
         no_button.draw(screen)
+        
  
     pygame.display.update()
 
