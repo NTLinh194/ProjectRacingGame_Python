@@ -12,7 +12,7 @@ red = (200, 0, 0)
 white = (255, 255, 255)
 # tao cua so game
 width= 700
-height = 800
+height = 650
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -54,7 +54,7 @@ left_edge = (width/2-155, 0, street_width, height)
 right_edge = (width/2+145, 0, street_width, height)
 # vi tri ban dau xe ng choi
 player_x = width/2
-player_y = 700
+player_y = 600
 # doi tuong xe luu thong
 class vehicle(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
