@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 import random
 import button 
-import save_score
 
 pygame.init()
 # color 
@@ -37,6 +36,7 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 gameOver = False
 speed = 3
 score = 0
+h_score = 0
 number_of_road = 3
 # duong xe chay
 road_width = number_of_road*100
@@ -108,7 +108,6 @@ trees_image=[]
 for i in tree_images_name:
     image = pygame.image.load('images/' + i)
     trees_image.append(image)
-
 # cai dat fps
 clock = pygame.time.Clock()
 fps = 120
@@ -215,16 +214,28 @@ while running:
             trees.kill()
     tree_group.draw(screen)
     # hien thi diem
-    font = pygame.font.Font(pygame.font.get_default_font(), 16)
+    font = pygame.font.Font(pygame.font.get_default_font(), 24)
     text = font.render(f'Score: {score}', True, white)
     text_rect = text.get_rect()
     text_rect.center = (50, 40)
     screen.blit(text, text_rect)
+    if(score >= h_score):
+        h_score = score
 
     if gameOver:
+        pygame.draw.rect(screen, green, (0, 0, 100, 100))
         screen.blit(crash, crash_rect)
         pygame.draw.rect(screen, red, (0, 50, width, 100))
-        font = pygame.font.Font(pygame.font.get_default_font(), 16)
+        font = pygame.font.Font(pygame.font.get_default_font(), 40)
+        text_h_score = font.render(f'High Score: {h_score}', True, white)
+        text_rect_score= text_h_score.get_rect()
+        text_rect_score.center = (width/2, height/3)
+        screen.blit(text_h_score, text_rect_score)
+        font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        text = font.render(f'Your Score: {score}', True, white)
+        text_rect = text.get_rect()
+        text_rect.center = (width/2,height/3+100)
+        screen.blit(text, text_rect)
         text = font.render(f'Game over! Play again? (Yes / No)', True, white)
         text_rect = text.get_rect()
         text_rect.center = (width/2, 100)
@@ -242,7 +253,7 @@ while running:
             # reset game
             gameOver = False
             score = 0
-            speed = 2
+            speed = 3
             vehicle_group.empty()
             player.rect.center = [player_x, player_y]
         if no_button.draw(screen):
