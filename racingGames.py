@@ -11,9 +11,9 @@ green = (76, 208, 56)
 yellow = (255, 232, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
-# tao cua so game
-width= 800
-height = 600
+# tao cua so 
+width= 700
+height = 650
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 #screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -37,7 +37,11 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 gameOver = False
 speed = 6
 score = 0
+
 number_of_lane = 6
+h_score = 0
+
+
 # duong xe chay
 road_width = number_of_lane*100
 street_width = 10
@@ -52,11 +56,13 @@ road = (lanes[0]-50, 0 , road_width, height)
 left_edge = (lanes[0]-55, 0, street_width, height)
 right_edge = (lanes[-1]+45, 0, street_width, height)
 # vi tri ban dau xe ng choi
+
 player_x = lanes[int((number_of_lane-1)/2)]
 player_y = height/5*4
 # sprite groups
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
+tree_group = pygame.sprite.Group()
 
 # tao xe ng choi
 player = vehicle.PlayerVehicle(player_x, player_y)
@@ -72,8 +78,27 @@ for name in image_name:
 # load hinh va cham
 crash = pygame.image.load('images/crash.png')
 crash_rect = crash.get_rect()
-
-
+# area of tree
+area_trees=[25,50,75,100,125,150,width-150,width-125,width-100,width-75,width-50,width-25]
+area_of_tree_left = (0, 0 , 150, height)
+area_of_tree_right = (width-150, 0 , 150, height)
+# doi tuong cay
+class tree(pygame.sprite.Sprite):
+    def __init__(self, image, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        # scale img
+        image_scale = 80 / image.get_rect().width
+        new_width = image.get_rect().width * image_scale
+        new_height = image.get_rect().height * image_scale
+        self.image = pygame.transform.scale(image, (new_width, new_height))
+        self.rect = self.image.get_rect()
+        self.rect.center = [x, y]
+# create ramdon tree
+tree_images_name=['tree 1.png', 'tree 2.png', 'tree 3.png']
+trees_image=[]
+for i in tree_images_name:
+    image = pygame.image.load('images/' + i)
+    trees_image.append(image)
 # cai dat fps
 clock = pygame.time.Clock()
 fps = 120
@@ -124,6 +149,9 @@ while running:
     screen.fill(green)
     # ve road 
     pygame.draw.rect(screen, gray, road)
+    # draw area_of_tree
+    pygame.draw.rect(screen,green,area_of_tree_left)
+    pygame.draw.rect(screen,green,area_of_tree_right)   
     # ve edge - hanh lang duong
     pygame.draw.rect(screen, yellow, left_edge)
     pygame.draw.rect(screen, yellow, right_edge)
@@ -158,27 +186,57 @@ while running:
             score += 1
             # tang toc do chay
             if score > 0 and score % 5 == 0:
-                speed += 1
-
+                speed += 0.5
     # ve nhom xe luu thong
     vehicle_group.draw(screen)
+     # draw tree
+    if len(tree_group) < 20:
+        add_tree = True
+        for i in tree_group:
+            if i.rect.top < i.rect.height * 1.5:
+                add_tree = False
+        if add_tree:
+            area_tree = random.choice(area_trees)
+            image = random.choice(trees_image)
+            trees = tree(image, area_tree, -100)
+            tree_group.add(trees)
+    # move tree
+    for trees in tree_group:
+        trees.rect.y += speed
+        # remove the tree
+        if trees.rect.top >= height:
+            trees.kill()
+    tree_group.draw(screen)
     # hien thi diem
-    font = pygame.font.Font(pygame.font.get_default_font(), 16)
+    font = pygame.font.Font(pygame.font.get_default_font(), 24)
     text = font.render(f'Score: {score}', True, white)
     text_rect = text.get_rect()
     text_rect.center = (50, 40)
     screen.blit(text, text_rect)
+    if(score >= h_score):
+        h_score = score
 
     if gameOver:
+        pygame.draw.rect(screen, green, (0, 0, 100, 100))
         screen.blit(crash, crash_rect)
         pygame.draw.rect(screen, red, (0, 50, width, 100))
-        font = pygame.font.Font(pygame.font.get_default_font(), 16)
+        font = pygame.font.Font(pygame.font.get_default_font(), 40)
+        text_h_score = font.render(f'High Score: {h_score}', True, white)
+        text_rect_score= text_h_score.get_rect()
+        text_rect_score.center = (width/2, height/3)
+        screen.blit(text_h_score, text_rect_score)
+        font = pygame.font.Font(pygame.font.get_default_font(), 30)
+        text = font.render(f'Your Score: {score}', True, white)
+        text_rect = text.get_rect()
+        text_rect.center = (width/2,height/3+100)
+        screen.blit(text, text_rect)
         text = font.render(f'Game over! Play again? (Yes / No)', True, white)
         text_rect = text.get_rect()
         text_rect.center = (width/2, 100)
         screen.blit(text, text_rect)
         yes_button.draw(screen)
         no_button.draw(screen)
+        
  
     pygame.display.update()
 
@@ -189,7 +247,7 @@ while running:
             # reset game
             gameOver = False
             score = 0
-            speed = 2
+            speed = 3
             vehicle_group.empty()
             player.rect.center = [player_x, player_y]
         if no_button.draw(screen):
