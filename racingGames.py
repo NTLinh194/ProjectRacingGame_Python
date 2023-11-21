@@ -12,7 +12,7 @@ yellow = (255, 232, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
 # tao cua so 
-width= 700
+width= 800
 height = 650
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
@@ -37,11 +37,11 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 gameOver = False
 speed = 6
 score = 0
+number_of_lane = 5
 
-number_of_lane = 6
-h_score = 0
-
-
+f = open("highScore.txt","r")
+h_score = int(f.read())
+f.close()
 # duong xe chay
 road_width = number_of_lane*100
 street_width = 10
@@ -189,14 +189,14 @@ while running:
                 speed += 0.5
     # ve nhom xe luu thong
     vehicle_group.draw(screen)
-     # draw tree
+    # draw tree
     if len(tree_group) < 20:
         add_tree = True
         for i in tree_group:
             if i.rect.top < i.rect.height * 1.5:
                 add_tree = False
         if add_tree:
-            area_tree = random.choice(area_trees)
+            area_tree = random.choice([random.randint(0,lanes[0]-75),random.randint(lanes[-1]+85,width)])
             image = random.choice(trees_image)
             trees = tree(image, area_tree, -100)
             tree_group.add(trees)
@@ -270,5 +270,9 @@ while running:
                     # exit game
                     gameOver = False
                     running = False
+
+f = open("highScore.txt","w")
+f.write(str(h_score))
+f.close()
 pygame.quit()
 
