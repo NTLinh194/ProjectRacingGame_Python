@@ -2,6 +2,7 @@ import pygame
 from pygame.locals import *
 import random
 import button 
+import vehicle
 
 pygame.init()
 # color 
@@ -10,7 +11,7 @@ green = (76, 208, 56)
 yellow = (255, 232, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
-# tao cua so game
+# tao cua so 
 width= 700
 height = 650
 screen_size = (width, height)
@@ -19,7 +20,7 @@ screen = pygame.display.set_mode(screen_size)
 pygame.display.set_caption('Racing Games')
 # khoi tao menu
 # load menu button images
-button_images_name = ['button_resume.png','button_quit.png']
+button_images_name = ['button_start.png','button_quit.png']
 number_of_button=len(button_images_name)
 buttons = []
 for button_number,name in enumerate (button_images_name):
@@ -34,56 +35,46 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 #yes_button=button.Button(0,0,yes_img,1)
 # khoi tao bien
 gameOver = False
-speed = 3
+speed = 6
 score = 0
+
+number_of_lane = 6
 h_score = 0
-number_of_road = 3
+
+
 # duong xe chay
-road_width = number_of_road*100
+road_width = number_of_lane*100
 street_width = 10
 street_height = 50
 # lan duong xe chay
-lane_left = width/2-100
-land_center = width/2
-lane_right = width/2+100
-lanes = [lane_left, land_center, lane_right]
+lanes = []
+for i in range (number_of_lane):
+    lanes.append(width/2-(number_of_lane/2)*100+i*100+50)
 lane_move_y = 0
 # road and edge
-road = (width/2-150, 0 , road_width, height)
-left_edge = (width/2-155, 0, street_width, height)
-right_edge = (width/2+145, 0, street_width, height)
+road = (lanes[0]-50, 0 , road_width, height)
+left_edge = (lanes[0]-55, 0, street_width, height)
+right_edge = (lanes[-1]+45, 0, street_width, height)
 # vi tri ban dau xe ng choi
-player_x = width/2
-player_y = 600
-# doi tuong xe luu thong
-class vehicle(pygame.sprite.Sprite):
-    def __init__(self, image, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        # scale img
-        image_scale = 45 / image.get_rect().width
-        new_width = image.get_rect().width * image_scale
-        new_height = image.get_rect().height * image_scale
-        self.image = pygame.transform.scale(image, (new_width, new_height))
-        self.rect = self.image.get_rect()
-        self.rect.center = [x, y]
-# doi tuong xe player
-class PlayerVehicle(vehicle):
-    def __init__(self, x, y):
-        image = pygame.image.load('images/car.png')
-        super().__init__(image, x, y)
+
+player_x = lanes[int((number_of_lane-1)/2)]
+player_y = height/5*4
 # sprite groups
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
 tree_group = pygame.sprite.Group()
+
 # tao xe ng choi
-player = PlayerVehicle(player_x, player_y)
+player = vehicle.PlayerVehicle(player_x, player_y)
 player_group.add(player)
+
 # load xe luu thong
 image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png']
 vehicle_images = []
 for name in image_name:
     image = pygame.image.load('images/' + name)
     vehicle_images.append(image)
+
 # load hinh va cham
 crash = pygame.image.load('images/crash.png')
 crash_rect = crash.get_rect()
@@ -113,6 +104,7 @@ clock = pygame.time.Clock()
 fps = 120
 waiting=True
 running = True
+
 #vòng lặp menu bắt đầu
 while waiting:
     screen.fill(green)
@@ -140,9 +132,9 @@ while running:
             running = False
         # dieu khien xe
         if event.type == KEYDOWN:
-            if event.key == K_LEFT and player.rect.center[0] > lane_left:
+            if event.key == K_LEFT and player.rect.center[0] > lanes[0]:
                 player.rect.x -= 100
-            if event.key == K_RIGHT and player.rect.center[0] < lane_right:
+            if event.key == K_RIGHT and player.rect.center[0] < lanes[-1]:
                 player.rect.x += 100
             # check va cham khi dieu khien
             for vehicle_car in vehicle_group:
@@ -168,10 +160,11 @@ while running:
     if lane_move_y >= street_height * 2:
         lane_move_y = 0
     for y in range(street_height * -2, height, street_height * 2):
-        pygame.draw.rect(screen, white, (lane_left + 45, y + lane_move_y, street_width, street_height))
-        pygame.draw.rect(screen, white, (land_center + 45, y + lane_move_y, street_width, street_height))
+        for lane in range(number_of_lane-1) : 
+            pygame.draw.rect(screen, white, (lanes[lane] + 45, y + lane_move_y, street_width, street_height))
     # ve xe player
     player_group.draw(screen)
+
     # ve phuong tien giao thong
     if len(vehicle_group) < 2:
         add_vehicle = True
@@ -181,8 +174,9 @@ while running:
         if add_vehicle:
             lane = random.choice(lanes)
             image = random.choice(vehicle_images)
-            vehicle_car = vehicle(image, lane, height / -2)
+            vehicle_car = vehicle.vehicle(image, lane, height / -2)
             vehicle_group.add(vehicle_car)
+
     # cho xe cong cong chay
     for vehicle_car in vehicle_group:
         vehicle_car.rect.y += speed
