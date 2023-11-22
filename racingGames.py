@@ -3,6 +3,7 @@ from pygame.locals import *
 import random
 import button 
 import vehicle
+import tree
 
 pygame.init()
 # color 
@@ -78,19 +79,6 @@ for name in image_name:
 # load hinh va cham
 crash = pygame.image.load('images/crash.png')
 crash_rect = crash.get_rect()
-# area of tree
-area_trees=[25,50,75,100,125,150,width-150,width-125,width-100,width-75,width-50,width-25]
-# doi tuong cay
-class tree(pygame.sprite.Sprite):
-    def __init__(self, image, x, y):
-        pygame.sprite.Sprite.__init__(self)
-        # scale img
-        image_scale = 80 / image.get_rect().width
-        new_width = image.get_rect().width * image_scale
-        new_height = image.get_rect().height * image_scale
-        self.image = pygame.transform.scale(image, (new_width, new_height))
-        self.rect = self.image.get_rect()
-        self.rect.center = [x, y]
 # create ramdon tree
 tree_images_name=['tree 1.png', 'tree 2.png', 'tree 3.png']
 trees_image=[]
@@ -125,9 +113,9 @@ while waiting:
             if i.rect.top < i.rect.height * 1.5:
                 add_tree = False
         if add_tree:
-            area_tree = random.choice([random.randint(0,lanes[0]-75),random.randint(lanes[-1]+85,width)])
             image = random.choice(trees_image)
-            trees = tree(image, area_tree, -100)
+            area_tree = random.choice([random.randint(0,lanes[0]-140),random.randint(lanes[-1]+140+street_width,width)])
+            trees = tree.Tree(image, area_tree, -100)
             tree_group.add(trees)
     # move tree
     for trees in tree_group:
@@ -222,9 +210,9 @@ while running:
             if i.rect.top < i.rect.height * 1.5:
                 add_tree = False
         if add_tree:
-            area_tree = random.choice([random.randint(0,lanes[0]-75),random.randint(lanes[-1]+85,width)])
             image = random.choice(trees_image)
-            trees = tree(image, area_tree, -100)
+            area_tree = random.choice([random.randint(0,lanes[0]-140),random.randint(lanes[-1]+140+street_width,width)])
+            trees = tree.Tree(image, area_tree, -100)
             tree_group.add(trees)
     # move tree
     for trees in tree_group:
