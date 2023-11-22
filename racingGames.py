@@ -35,7 +35,7 @@ no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_heig
 #yes_button=button.Button(0,0,yes_img,1)
 # khoi tao bien
 gameOver = False
-speed = 6
+speed = 4
 score = 0
 number_of_lane = 5
 
@@ -80,8 +80,6 @@ crash = pygame.image.load('images/crash.png')
 crash_rect = crash.get_rect()
 # area of tree
 area_trees=[25,50,75,100,125,150,width-150,width-125,width-100,width-75,width-50,width-25]
-area_of_tree_left = (0, 0 , 150, height)
-area_of_tree_right = (width-150, 0 , 150, height)
 # doi tuong cay
 class tree(pygame.sprite.Sprite):
     def __init__(self, image, x, y):
@@ -107,7 +105,38 @@ running = True
 
 #vòng lặp menu bắt đầu
 while waiting:
+    # ve dia hinh co
     screen.fill(green)
+    # ve road 
+    pygame.draw.rect(screen, gray, road)
+    # ve edge - hanh lang duong
+    pygame.draw.rect(screen, yellow, left_edge)
+    pygame.draw.rect(screen, yellow, right_edge)
+    lane_move_y += speed 
+    if lane_move_y >= street_height * 2:
+        lane_move_y = 0
+    for y in range(street_height * -2, height, street_height * 2):
+        for lane in range(number_of_lane-1) : 
+            pygame.draw.rect(screen, white, (lanes[lane] + 45, y + lane_move_y, street_width, street_height))
+    # draw tree
+    if len(tree_group) < 20:
+        add_tree = True
+        for i in tree_group:
+            if i.rect.top < i.rect.height * 1.5:
+                add_tree = False
+        if add_tree:
+            area_tree = random.choice([random.randint(0,lanes[0]-75),random.randint(lanes[-1]+85,width)])
+            image = random.choice(trees_image)
+            trees = tree(image, area_tree, -100)
+            tree_group.add(trees)
+    # move tree
+    for trees in tree_group:
+        trees.rect.y += speed
+        # remove the tree
+        if trees.rect.top >= height:
+            trees.kill()
+    tree_group.draw(screen)
+    #vẽ nút
     if buttons[0].draw(screen):
         waiting = False
     if buttons[1].draw(screen):
@@ -148,10 +177,7 @@ while running:
     # ve dia hinh co
     screen.fill(green)
     # ve road 
-    pygame.draw.rect(screen, gray, road)
-    # draw area_of_tree
-    pygame.draw.rect(screen,green,area_of_tree_left)
-    pygame.draw.rect(screen,green,area_of_tree_right)   
+    pygame.draw.rect(screen, gray, road) 
     # ve edge - hanh lang duong
     pygame.draw.rect(screen, yellow, left_edge)
     pygame.draw.rect(screen, yellow, right_edge)
@@ -247,7 +273,7 @@ while running:
             # reset game
             gameOver = False
             score = 0
-            speed = 3
+            speed = 4
             vehicle_group.empty()
             player.rect.center = [player_x, player_y]
         if no_button.draw(screen):
@@ -263,7 +289,7 @@ while running:
                     # reset game
                     gameOver = False
                     score = 0
-                    speed = 3
+                    speed = 4
                     vehicle_group.empty()
                     player.rect.center = [player_x, player_y]
                 elif event.key == K_n:
