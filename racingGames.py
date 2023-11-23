@@ -12,12 +12,13 @@ green = (76, 208, 56)
 yellow = (255, 232, 0)
 red = (200, 0, 0)
 white = (255, 255, 255)
-# tao cua so 
+# tao cửa sổ
 width= 800
 height = 650
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
-#screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
+# full màn hình
+# screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption('Racing Games')
 # khoi tao menu
 # load menu button images
@@ -31,9 +32,8 @@ for button_number,name in enumerate (button_images_name):
 #load game over button
 yes_img=pygame.image.load('images/button_yes.png').convert_alpha()
 no_img=pygame.image.load('images/button_no.png').convert_alpha()
-yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/4*3.0,yes_img,1)
-no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/4*3.0,no_img,1)
-#yes_button=button.Button(0,0,yes_img,1)
+yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/7*5.0,yes_img,1)
+no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/7*5.0,no_img,1)
 # khoi tao bien
 gameOver = False
 speed = 4
@@ -57,9 +57,13 @@ road = (lanes[0]-50, 0 , road_width, height)
 left_edge = (lanes[0]-55, 0, street_width, height)
 right_edge = (lanes[-1]+45, 0, street_width, height)
 # vi tri ban dau xe ng choi
-
 player_x = lanes[int((number_of_lane-1)/2)]
 player_y = height/5*4
+# vi tri cay
+tree_left_edge_min=min(0,lanes[0]-140)
+tree_left_edge_max=max(0,lanes[0]-140)
+tree_right_edge_min=min(lanes[-1]+140,width)
+tree_right_edge_max=max(lanes[-1]+140,width)
 # sprite groups
 player_group = pygame.sprite.Group()
 vehicle_group = pygame.sprite.Group()
@@ -100,7 +104,7 @@ while waiting:
     # ve edge - hanh lang duong
     pygame.draw.rect(screen, yellow, left_edge)
     pygame.draw.rect(screen, yellow, right_edge)
-    lane_move_y += speed 
+    lane_move_y += speed *1.5
     if lane_move_y >= street_height * 2:
         lane_move_y = 0
     for y in range(street_height * -2, height, street_height * 2):
@@ -114,12 +118,12 @@ while waiting:
                 add_tree = False
         if add_tree:
             image = random.choice(trees_image)
-            area_tree = random.choice([random.randint(0,lanes[0]-140),random.randint(lanes[-1]+140+street_width,width)])
+            area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
             trees = tree.Tree(image, area_tree, -100)
             tree_group.add(trees)
     # move tree
     for trees in tree_group:
-        trees.rect.y += speed
+        trees.rect.y += speed*1.5
         # remove the tree
         if trees.rect.top >= height:
             trees.kill()
@@ -168,9 +172,8 @@ while running:
     pygame.draw.rect(screen, gray, road) 
     # ve edge - hanh lang duong
     pygame.draw.rect(screen, yellow, left_edge)
-    pygame.draw.rect(screen, yellow, right_edge)
-    # ve lane duong
-    lane_move_y += speed * 2
+    pygame.draw.rect(screen, yellow, right_edge)    # ve lane duong
+    lane_move_y += speed *1.5
     if lane_move_y >= street_height * 2:
         lane_move_y = 0
     for y in range(street_height * -2, height, street_height * 2):
@@ -193,7 +196,7 @@ while running:
 
     # cho xe cong cong chay
     for vehicle_car in vehicle_group:
-        vehicle_car.rect.y += speed
+        vehicle_car.rect.y += speed 
         # remove the vehicle
         if vehicle_car.rect.top >= height:
             vehicle_car.kill()
@@ -211,12 +214,12 @@ while running:
                 add_tree = False
         if add_tree:
             image = random.choice(trees_image)
-            area_tree = random.choice([random.randint(0,lanes[0]-140),random.randint(lanes[-1]+140+street_width,width)])
+            area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
             trees = tree.Tree(image, area_tree, -100)
             tree_group.add(trees)
     # move tree
     for trees in tree_group:
-        trees.rect.y += speed
+        trees.rect.y += speed*1.5
         # remove the tree
         if trees.rect.top >= height:
             trees.kill()
@@ -231,7 +234,6 @@ while running:
         h_score = score
 
     if gameOver:
-        pygame.draw.rect(screen, green, (0, 0, 100, 100))
         screen.blit(crash, crash_rect)
         pygame.draw.rect(screen, red, (0, 50, width, 100))
         font = pygame.font.Font(pygame.font.get_default_font(), 40)
