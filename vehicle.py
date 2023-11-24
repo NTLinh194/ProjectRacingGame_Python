@@ -12,6 +12,6 @@ class vehicle(pygame.sprite.Sprite):
         self.rect.center = [x, y]
 # doi tuong xe player
 class PlayerVehicle(vehicle):
-    def __init__(self, x, y):
-        image = pygame.image.load('images/car.png')
+    def __init__(self,car_name,x, y):
+        image = pygame.image.load('images/'+car_name)
         super().__init__(image, x, y)
