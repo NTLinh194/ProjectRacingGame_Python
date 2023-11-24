@@ -15,7 +15,7 @@ white = (255, 255, 255)
 black = (0,0,0)
 # tao cửa sổ
 width= 900
-height = 650
+height = 750
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 
@@ -51,8 +51,14 @@ for car_number,name in enumerate (select_car_images_name):
 #load game over button
 yes_img=pygame.image.load('images/button_yes.png')
 no_img=pygame.image.load('images/button_no.png')
+pause_img=pygame.image.load('images/pause.png')
+quit_img=pygame.image.load('images/button_quit.png')
 yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/7*5.0,yes_img,1)
 no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/7*5.0,no_img,1)
+pause_button=button.Button(width-100,height-100,pause_img,0.3)
+continue_img=pygame.image.load('images/Fast_Forward_Idle.png')
+continue_button=button.Button(width/2.3,height/2.9,continue_img,2)
+quit_button=button.Button((width-no_img.get_width())/2.3,(height-no_img.get_height())/1.3,quit_img,1)
 # khoi tao bien
 car_name='car_1.png'
 score = 0
@@ -63,6 +69,7 @@ number_of_lane = 5
 gameOver = False
 running=True
 waiting=True
+not_pause=True
 
 while running:
 
@@ -123,7 +130,6 @@ while running:
         clock.tick(fps)
         # ve dia hinh co
         screen.fill(green)
-        
         # ve road 
         pygame.draw.rect(screen, gray, road)
         # ve edge - hanh lang duong
@@ -203,8 +209,11 @@ while running:
                 running = False
                 waiting = False
                 playing = False
+                not_pause = True
             # dieu khien xe
             if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    not_pause = False
                 if event.key == K_LEFT and player.rect.center[0] > lanes[0]:
                     player.rect.x -= 100
                 if event.key == K_RIGHT and player.rect.center[0] < lanes[-1]:
@@ -290,6 +299,20 @@ while running:
         screen.blit(text, text_rect)
         if(score >= h_score):
             h_score = score
+        # pause icon
+        if not_pause:
+            if pause_button.draw(screen):
+                not_pause = False
+            
+        if not_pause==False:
+            pygame.draw.rect(screen, black, (0, 50, width, 150))
+            continue_button.draw(screen)     
+            quit_button.draw(screen)
+            font = pygame.font.Font(pygame.font.get_default_font(), 40)
+            text_pasue_game=font.render('Your Game is PAUSE!!!', True, white)
+            text_pasue_rect= text_pasue_game.get_rect()
+            text_pasue_rect.center = (width/2, height/5)
+            screen.blit(text_pasue_game,text_pasue_rect)
 
         if gameOver:
             screen.blit(crash, crash_rect)
@@ -314,6 +337,25 @@ while running:
             
     
         pygame.display.update()
+        
+        while not_pause == False:
+            clock.tick(fps)
+            if continue_button.draw(screen):
+                gameOver = False
+                not_pause=True
+            if no_button.draw(screen):
+                gameOver = False
+                playing = False
+                waiting = True   
+                not_pause=True 
+                
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    running = False
+                    waiting = False
+                    playing = False
+                    not_pause=True
+                
 
         while gameOver:
             clock.tick(fps)
@@ -322,7 +364,7 @@ while running:
                 # reset game
                 gameOver = False
                 score = 0
-                speed = 4
+                speed = 3
                 vehicle_group.empty()
                 player.rect.center = [player_x, player_y]
             if no_button.draw(screen):
