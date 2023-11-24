@@ -20,7 +20,6 @@ screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 
 # full màn hình
-# background
 # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption('Racing Games')
 # khoi tao menu
@@ -41,7 +40,7 @@ for button_number,name in enumerate (select_button_images_name):
     button_temp = button.Button( (width/number_of_select_button)*(button_number+0.5)-image.get_width()/2,(height-image.get_height())/3*2, image, 1)
     select_buttons.append(button_temp)
 # load car select menu button images
-select_car_images_name = ['car_1.png','car2.png','car3.png','car4.png','car5.png','car6.png','car7.png','car8.png']
+select_car_images_name = ['car_1.png','car_2.png','car_3.png','car_4.png','car_5.png','car_6.png','car_7.png','car_8.png']
 number_of_select_car=len(select_car_images_name)
 select_cars = []
 for car_number,name in enumerate (select_car_images_name):
@@ -53,6 +52,24 @@ yes_img=pygame.image.load('images/button_yes.png')
 no_img=pygame.image.load('images/button_no.png')
 yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/7*5.0,yes_img,1)
 no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/7*5.0,no_img,1)
+# load boost and extra score image
+boost_image=pygame.image.load('images/boost.png')
+extra_score_image=pygame.image.load('images/extra_score.png')
+# load xe luu thong
+image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png']
+vehicle_images = []
+for name in image_name:
+    image = pygame.image.load('images/' + name)
+    vehicle_images.append(image)
+# load hinh va cham
+crash = pygame.image.load('images/crash.png')
+crash_rect = crash.get_rect()
+# create ramdon tree
+tree_images_name=['tree_1.png', 'tree_2.png', 'tree_3.png', 'tree_4.png', 'tree_5.png', 'tree_6.png']
+trees_image=[]
+for i in tree_images_name:
+    image = pygame.image.load('images/' + i)
+    trees_image.append(image)
 # khoi tao bien
 car_name='car_1.png'
 score = 0
@@ -63,11 +80,13 @@ number_of_lane = 5
 gameOver = False
 running=True
 waiting=True
-
+boost_start_time=pygame.time.get_ticks()
+boost_spawn_time=pygame.time.get_ticks()
+extra_spawn_time=pygame.time.get_ticks()
 while running:
-
     # duong xe chay
     speed = 4
+    boost_status=False
     road_width = number_of_lane*100
     street_width = 10
     street_height = 50
@@ -91,27 +110,16 @@ while running:
     # sprite groups
     player_group = pygame.sprite.Group()
     vehicle_group = pygame.sprite.Group()
+    extra_score_group = pygame.sprite.Group()
     tree_group = pygame.sprite.Group()
+    boost_group = pygame.sprite.Group()
 
     # tao xe ng choi
     player = vehicle.vehicle(pygame.image.load('images/' + car_name),player_x, player_y)
     player_group.add(player)
 
-    # load xe luu thong
-    image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png']
-    vehicle_images = []
-    for name in image_name:
-        image = pygame.image.load('images/' + name)
-        vehicle_images.append(image)
-    # load hinh va cham
-    crash = pygame.image.load('images/crash.png')
-    crash_rect = crash.get_rect()
-    # create ramdon tree
-    tree_images_name=['tree_1.png', 'tree_2.png', 'tree_3.png', 'tree_4.png', 'tree_5.png', 'tree_6.png']
-    trees_image=[]
-    for i in tree_images_name:
-        image = pygame.image.load('images/' + i)
-        trees_image.append(image)
+    
+    player_group.add(player) 
     # cai dat fps
     clock = pygame.time.Clock()
     fps = 120
@@ -123,7 +131,6 @@ while running:
         clock.tick(fps)
         # ve dia hinh co
         screen.fill(green)
-        
         # ve road 
         pygame.draw.rect(screen, gray, road)
         # ve edge - hanh lang duong
@@ -209,22 +216,31 @@ while running:
                     player.rect.x -= 100
                 if event.key == K_RIGHT and player.rect.center[0] < lanes[-1]:
                     player.rect.x += 100
-                # check va cham khi dieu khien
-            for vehicle_car in vehicle_group:
-                if pygame.sprite.collide_rect(player, vehicle_car):
-                    gameOver = True
-        # check va cham khi xe dung in
+        for extra_score in extra_score_group:
+            if pygame.sprite.collide_rect(player, extra_score):
+                score+=1
+                extra_score.kill()
+        for boost in boost_group:
+            if pygame.sprite.collide_rect(player, boost):
+                speed+= 3
+                boost_start_time=pygame.time.get_ticks()
+                boost_status=True
+                boost.kill()
+        if pygame.time.get_ticks()-boost_start_time>4000 and boost_status:
+            speed-=3
+            boost_status=False
+        # check va cham 
         if pygame.sprite.spritecollide(player, vehicle_group, True):
             gameOver = True
             crash_rect.center = [player.rect.center[0], player.rect.top]
-
         # ve dia hinh co
         screen.fill(green)
         # ve road 
         pygame.draw.rect(screen, gray, road) 
         # ve edge - hanh lang duong
         pygame.draw.rect(screen, yellow, left_edge)
-        pygame.draw.rect(screen, yellow, right_edge)    # ve lane duong
+        pygame.draw.rect(screen, yellow, right_edge)    
+        # ve lane duong
         lane_move_y += speed *1.5
         if lane_move_y >= street_height * 2:
             lane_move_y = 0
@@ -238,7 +254,7 @@ while running:
         if len(vehicle_group) < number_of_lane/2+speed:
             add_vehicle = True 
             for vehicle_car in vehicle_group:
-                if vehicle_car.rect.top < vehicle_car.rect.height * 1:
+                if vehicle_car.rect.top < vehicle_car.rect.height*speed :
                     add_vehicle = False
             vehicle_lanes = list(range(0,number_of_lane))
             random.shuffle(vehicle_lanes)
@@ -248,9 +264,48 @@ while running:
                 vehicle_lanes.pop(0)
                 image = random.choice(vehicle_images)
                 vehicle_car = vehicle.vehicle(image, lane, height / -2)
-                vehicle_group.add(vehicle_car)
+                overlap=False
+                for extra_score in extra_score_group:
+                    if pygame.sprite.collide_rect(vehicle_car,extra_score):
+                        overlap=True
+                if not(overlap):
+                    vehicle_group.add(vehicle_car)
                 if(random.randint(0,100)<number_of_lane*speed):
                     add_vehicle = True
+        if (pygame.time.get_ticks()-extra_spawn_time)%3000<10 and len(extra_score_group)<1:
+            extra_spawn_time=pygame.time.get_ticks()
+            if(random.randint(0,100)<50):
+                lane = lanes[random.randint(0,number_of_lane-1)]
+                extra_score = vehicle.vehicle(extra_score_image, lane, height / -2)
+                extra_score_group.add(extra_score)
+                for vehicle_car in vehicle_group:
+                    if pygame.sprite.collide_rect(extra_score, vehicle_car):
+                        vehicle_car.kill()
+        if (pygame.time.get_ticks()-boost_spawn_time)%4000<10 and(not boost_status )and len(boost_group)<1:
+            add_boost=True
+            boost_spawn_time=pygame.time.get_ticks()
+            if(add_boost and random.randint(0,100)<30):
+                lane = lanes[random.randint(0,number_of_lane-1)]
+                boost = vehicle.vehicle(boost_image, lane, height / -2)
+                boost_group.add(boost)
+                for vehicle_car in vehicle_group:
+                    if pygame.sprite.collide_rect(boost, vehicle_car):
+                        vehicle_car.kill()
+        #move extra score
+        for extra_score in extra_score_group:
+            extra_score.rect.y += speed 
+            # remove extra score
+            if extra_score.rect.top >= height:
+                extra_score.kill()
+        #move boost
+        for boost in boost_group:
+            boost.rect.y += speed 
+            # remove boost
+            if boost.rect.top >= height:
+                boost.kill()
+        #draw extra score
+        extra_score_group.draw(screen)
+        boost_group.draw(screen)
         # cho xe cong cong chay
         for vehicle_car in vehicle_group:
             vehicle_car.rect.y += speed 
@@ -260,7 +315,7 @@ while running:
                 score += 1
                 # tang toc do chay
                 if score > 0 and score % 5 == 0:
-                    speed += 0.5
+                    speed +=0.3
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
         # draw tree
@@ -286,12 +341,19 @@ while running:
         font = pygame.font.Font(pygame.font.get_default_font(), 24)
         text = font.render(f'Score: {score}', True, white)
         text_rect = text.get_rect()
-        text_rect.center = (50, 40)
+        text_rect.top=40
+        text_rect.left=5
+        screen.blit(text, text_rect)
+        text = font.render(f'Speed: {round(speed,1)}', True, white)
+        text_rect = text.get_rect()
+        text_rect.top=80
+        text_rect.left=5
         screen.blit(text, text_rect)
         if(score >= h_score):
             h_score = score
 
         if gameOver:
+            boost_status=False
             screen.blit(crash, crash_rect)
             pygame.draw.rect(screen, black, (0, 50, width, 100))
             font = pygame.font.Font(pygame.font.get_default_font(), 40)
