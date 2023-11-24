@@ -28,7 +28,7 @@ button_images_name = ['button_start.png','button_select_car.png','button_quit.pn
 number_of_button=len(button_images_name)
 buttons = []
 for button_number,name in enumerate (button_images_name):
-    image = pygame.image.load('images/' + name).convert_alpha()
+    image = pygame.image.load('images/' + name)
     button_temp = button.Button((width-image.get_width())/2, (height/number_of_button)*(button_number+0.5)-image.get_height()/2, image, 1)
     buttons.append(button_temp)
 # load lane select menu button images
@@ -36,7 +36,7 @@ select_button_images_name = ['button_3.png','button_4.png','button_5.png','butto
 number_of_select_button=len(select_button_images_name)
 select_buttons = []
 for button_number,name in enumerate (select_button_images_name):
-    image = pygame.image.load('images/' + name).convert_alpha()
+    image = pygame.image.load('images/' + name)
     button_temp = button.Button( (width/number_of_select_button)*(button_number+0.5)-image.get_width()/2,(height-image.get_height())/3*2, image, 1)
     select_buttons.append(button_temp)
 # load car select menu button images
@@ -44,12 +44,12 @@ select_car_images_name = ['car_1.png','car_2.png','car_3.png','car_4.png']
 number_of_select_car=len(select_car_images_name)
 select_cars = []
 for car_number,name in enumerate (select_car_images_name):
-    image = pygame.image.load('images/' + name).convert_alpha()
+    image = pygame.image.load('images/' + name)
     car_temp = button.Button( (width/number_of_select_car)*(car_number+0.5)-image.get_width()/2,(height-image.get_height())/3*2, image, 1)
     select_cars.append(car_temp)
 #load game over button
-yes_img=pygame.image.load('images/button_yes.png').convert_alpha()
-no_img=pygame.image.load('images/button_no.png').convert_alpha()
+yes_img=pygame.image.load('images/button_yes.png')
+no_img=pygame.image.load('images/button_no.png')
 yes_button=button.Button((width-yes_img.get_width())/2*0.5,(height-yes_img.get_height())/7*5.0,yes_img,1)
 no_button=button.Button((width-no_img.get_width())/2*1.5,(height-no_img.get_height())/7*5.0,no_img,1)
 # khoi tao bien
@@ -92,7 +92,7 @@ while running:
     tree_group = pygame.sprite.Group()
 
     # tao xe ng choi
-    player = vehicle.PlayerVehicle(car_name,player_x, player_y)
+    player = vehicle.vehicle(pygame.image.load('images/' + car_name),player_x, player_y)
     player_group.add(player)
 
     # load xe luu thong
@@ -206,9 +206,9 @@ while running:
                 if event.key == K_RIGHT and player.rect.center[0] < lanes[-1]:
                     player.rect.x += 100
                 # check va cham khi dieu khien
-                for vehicle_car in vehicle_group:
-                    if pygame.sprite.collide_rect(player, vehicle_car):
-                        gameOver = True
+            for vehicle_car in vehicle_group:
+                if pygame.sprite.collide_rect(player, vehicle_car):
+                    gameOver = True
         # check va cham khi xe dung in
         if pygame.sprite.spritecollide(player, vehicle_group, True):
             gameOver = True
