@@ -20,6 +20,7 @@ screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 
 # full màn hình
+# background
 # screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
 pygame.display.set_caption('Racing Games')
 # khoi tao menu
@@ -40,7 +41,7 @@ for button_number,name in enumerate (select_button_images_name):
     button_temp = button.Button( (width/number_of_select_button)*(button_number+0.5)-image.get_width()/2,(height-image.get_height())/3*2, image, 1)
     select_buttons.append(button_temp)
 # load car select menu button images
-select_car_images_name = ['car_1.png','car_2.png','car_3.png','car_4.png']
+select_car_images_name = ['car_1.png','car2.png','car3.png','car4.png','car5.png','car6.png','car7.png','car8.png']
 number_of_select_car=len(select_car_images_name)
 select_cars = []
 for car_number,name in enumerate (select_car_images_name):
@@ -64,6 +65,7 @@ running=True
 waiting=True
 
 while running:
+
     # duong xe chay
     speed = 4
     road_width = number_of_lane*100
@@ -82,10 +84,10 @@ while running:
     player_x = lanes[int((number_of_lane-1)/2)]
     player_y = height/5*4
     # vi tri cay
-    tree_left_edge_min=min(0,lanes[0]-140)
-    tree_left_edge_max=max(0,lanes[0]-140)
-    tree_right_edge_min=min(lanes[-1]+140,width)
-    tree_right_edge_max=max(lanes[-1]+140,width)
+    tree_left_edge_min=min(0,lanes[0]-100)
+    tree_left_edge_max=max(0,lanes[0]-100)
+    tree_right_edge_min=min(lanes[-1]+100,width)
+    tree_right_edge_max=max(lanes[-1]+100,width)
     # sprite groups
     player_group = pygame.sprite.Group()
     vehicle_group = pygame.sprite.Group()
@@ -96,7 +98,7 @@ while running:
     player_group.add(player)
 
     # load xe luu thong
-    image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png']
+    image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png']
     vehicle_images = []
     for name in image_name:
         image = pygame.image.load('images/' + name)
@@ -105,7 +107,7 @@ while running:
     crash = pygame.image.load('images/crash.png')
     crash_rect = crash.get_rect()
     # create ramdon tree
-    tree_images_name=['tree_1.png', 'tree_2.png', 'tree_3.png']
+    tree_images_name=['tree_1.png', 'tree_2.png', 'tree_3.png', 'tree_4.png', 'tree_5.png', 'tree_6.png']
     trees_image=[]
     for i in tree_images_name:
         image = pygame.image.load('images/' + i)
@@ -121,6 +123,7 @@ while running:
         clock.tick(fps)
         # ve dia hinh co
         screen.fill(green)
+        
         # ve road 
         pygame.draw.rect(screen, gray, road)
         # ve edge - hanh lang duong
@@ -133,16 +136,17 @@ while running:
             for lane in range(number_of_lane-1) : 
                 pygame.draw.rect(screen, white, (lanes[lane] + 45, y + lane_move_y, street_width, street_height))
         # draw tree
-        if len(tree_group) < 20:
+        if len(tree_group) < 25:
             add_tree = True
             for i in tree_group:
-                if i.rect.top < i.rect.height * 1.5:
+                if i.rect.top < i.rect.height * (random.uniform(0.2,0.5)):
                     add_tree = False
-            if add_tree:
-                image = random.choice(trees_image)
-                area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
-                trees = tree.Tree(image, area_tree, -100)
-                tree_group.add(trees)
+            if add_tree:              
+                for i in range(random.randint(0, 10)):
+                    image = random.choice(trees_image)
+                    area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
+                    trees = tree.Tree(image, area_tree, -200)
+                    tree_group.add(trees)
         # move tree
         for trees in tree_group:
             trees.rect.y += speed*1.5
@@ -260,16 +264,17 @@ while running:
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
         # draw tree
-        if len(tree_group) < 20:
+        if len(tree_group) < 25:
             add_tree = True
             for i in tree_group:
-                if i.rect.top < i.rect.height * 1.5:
+                if i.rect.top < i.rect.height * (random.uniform(0.2,0.5)):
                     add_tree = False
-            if add_tree:
-                image = random.choice(trees_image)
-                area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
-                trees = tree.Tree(image, area_tree, -100)
-                tree_group.add(trees)
+            if add_tree:              
+                for i in range(random.randint(0, 10)):
+                    image = random.choice(trees_image)
+                    area_tree = random.choice([random.randint(tree_left_edge_min,tree_left_edge_max),random.randint(tree_right_edge_min,tree_right_edge_max)])
+                    trees = tree.Tree(image, area_tree, -100)
+                    tree_group.add(trees)
         # move tree
         for trees in tree_group:
             trees.rect.y += speed*1.5
