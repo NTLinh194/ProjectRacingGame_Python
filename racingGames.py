@@ -107,7 +107,7 @@ boost_start_time=pygame.time.get_ticks()
 boost_spawn_time=pygame.time.get_ticks()
 extra_spawn_time=pygame.time.get_ticks()
 alert_time=pygame.time.get_ticks()
-alert_tick=8
+alert_tick=1
 # khoi tao input box 
 input_font = pygame.font.Font(None, 50)
 input_box = pygame.Rect(width/2-70, height/number_of_button*0.35, 140, 50)
@@ -379,7 +379,7 @@ while running:
                         overlap=True
                 if not(overlap):
                     vehicle_group.add(vehicle_car)
-                    alert = vehicle.vehicle(alert_image, lane, 50)
+                    alert = vehicle.vehicleAlert(alert_image, lane, 50, pygame.time.get_ticks())
                     alert_group.add(alert)
                 if(random.randint(0,100)<number_of_lane*speed):
                     add_vehicle = True
@@ -420,10 +420,10 @@ while running:
         if pygame.time.get_ticks()-alert_time>150 or alert_tick%2==0:
             alert_group.draw(screen)
             if pygame.time.get_ticks()-alert_time>150:
-                alert_tick-=1
+                alert_tick+=1
                 alert_time=pygame.time.get_ticks()
         for alert in alert_group:
-            if pygame.sprite.spritecollide(alert, vehicle_group, False)or pygame.sprite.spritecollide(alert, extra_score_group, False)or pygame.sprite.spritecollide(alert, boost_group, False):  
+            if pygame.sprite.spritecollide(alert, vehicle_group, False) or pygame.time.get_ticks()-alert.starting_tick>1000:  
                 alert.kill()
         # cho xe cong cong chay
         for vehicle_car in vehicle_group:
@@ -433,9 +433,9 @@ while running:
                 vehicle_car.kill()
                 score += 1
         # tang toc do chay
-            if score > score_for_speed_up :
-                score_for_speed_up+=speed
-                speed +=0.5
+        if score > score_for_speed_up :
+            score_for_speed_up+=speed
+            speed +=0.5
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
         # draw tree
@@ -530,7 +530,6 @@ while running:
                     waiting = False
                     playing = False
                     not_pause=True
-                
 
         while gameOver:
             clock.tick(fps)
