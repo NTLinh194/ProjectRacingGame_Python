@@ -4,7 +4,7 @@ import random
 import button 
 import vehicle
 import tree
-import csv
+import pandas as pd
 
 pygame.init()
 # color 
@@ -63,9 +63,16 @@ scale=170/continue_img.get_width()
 continue_button=button.Button((width-continue_img.get_width()*scale)/2,(height-continue_img.get_height()*scale)/2,continue_img,scale)
 quit_button=button.Button((width-no_img.get_width())/2.3,(height-no_img.get_height())/1.3,quit_img,1)
 return_img=pygame.image.load('images/button_return.png')
-return_button=button.Button((width-return_img.get_width())/2,height/4*3,return_img,1)
+return_button=button.Button((width-return_img.get_width())/2,height*0.8,return_img,1)
+# load button của high score menu
+all_img=pygame.image.load('images/button_all.png')
+your_img=pygame.image.load('images/button_your.png')
+all_button=button.Button(20,height*0.2,all_img,1)
+your_button=button.Button(20,height*0.5,your_img,1)
+
 # load boost, extra score and return image
 boost_image=pygame.image.load('images/boost.png')
+alert_image=pygame.image.load('images/alert.png')
 extra_score_image=pygame.image.load('images/extra_score.png')
 # load xe luu thong
 image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png']
@@ -85,14 +92,12 @@ for i in tree_images_name:
 # khoi tao bien
 car_name='car_1.png'
 score = 0
-h_scores=[]
-with open("highScore.csv", 'r') as file:
-    csvreader = csv.reader(file)
-    header = next(csvreader)
-    for row in csvreader:
-        h_scores.append(row)
-
-
+score_for_speed_up = 4
+# Read CSV
+h_scores = pd.read_csv('highScore.csv', usecols=['name', 'highScore'])
+h_scores=h_scores.drop_duplicates(keep='first')
+h_scores.sort_values(["highScore"],axis=0, ascending=[False],inplace=True) 
+h_scores.fillna('', inplace=True)
 number_of_lane = 5
 gameOver = False
 running=True
@@ -101,9 +106,11 @@ not_pause=True
 boost_start_time=pygame.time.get_ticks()
 boost_spawn_time=pygame.time.get_ticks()
 extra_spawn_time=pygame.time.get_ticks()
+alert_time=pygame.time.get_ticks()
+alert_tick=8
 # khoi tao input box 
 input_font = pygame.font.Font(None, 50)
-input_box = pygame.Rect(width/2-70, height/number_of_button*0.5, 140, 50)
+input_box = pygame.Rect(width/2-70, height/number_of_button*0.35, 140, 50)
 color_inactive = pygame.Color('lightskyblue3')
 color_active = pygame.Color('dodgerblue2')
 color = color_inactive
@@ -117,7 +124,7 @@ while running:
     road_width = number_of_lane*100
     street_width = 10
     street_height = 50
-    box_width=350
+    score_list=h_scores
     # lan duong xe chay
     lanes = []
     for i in range (number_of_lane):
@@ -141,6 +148,7 @@ while running:
     extra_score_group = pygame.sprite.Group()
     tree_group = pygame.sprite.Group()
     boost_group = pygame.sprite.Group()
+    alert_group = pygame.sprite.Group()
 
     # tao xe ng choi
     player = vehicle.vehicle(pygame.image.load('images/' + car_name),player_x, player_y)
@@ -236,38 +244,39 @@ while running:
                     selecting_car = False
         #xem điểm high score
         elif seeing_h_scores:
-            pygame.draw.rect(screen, black, (width/2-box_width/2, 60, box_width, 430))
+            pygame.draw.rect(screen, black, (width/2-233, 60, 666, 440))
             text = input_font.render(f'HIGH SCORES', True, white)
             text_rect = text.get_rect()
-            text_rect.center = (width/2, 100)
+            text_rect.center = (width/2+100, 100)
             screen.blit(text, text_rect)
             text = input_font.render(f'Name', True, white)
             text_rect = text.get_rect()
-            text_rect.left = width/2-box_width/2+15
+            text_rect.left = width/2-218
             text_rect.top = 150
             screen.blit(text, text_rect)
             text = input_font.render(f'Score', True, white)
             text_rect = text.get_rect()
-            text_rect.left = width/2+box_width/2-15-text_rect.width
+            text_rect.left = width/2+418-text_rect.width
             text_rect.top = 150
             screen.blit(text, text_rect)
-            for index in range(6):
+            if your_button.draw(screen):
+                score_list=h_scores.loc[h_scores['name'] == player_name]
+            if all_button.draw(screen):
+                score_list=h_scores
+            for index in range(min(6,len(score_list.index))):
                 #ten nguoi choi
-                text = input_font.render(f'{h_scores[index][0]}', True, white)
+                text = input_font.render(f'{score_list.iloc[[index],[0]].to_string(header=None, index=False)}', True, white)
                 text_rect = text.get_rect()
-                text_rect.left = width/2-box_width/2+15
+                text_rect.left = width/2-218
                 text_rect.top = 200+index*50
-                temp_width=text_rect.width
                 screen.blit(text, text_rect)
                 #diem so
-                text = input_font.render(f'{h_scores[index][1]}', True, white)
+                text = input_font.render(f'{score_list.iloc[[index],[1]].to_string(header=None, index=False)}', True, white)
                 text_rect = text.get_rect()
-                text_rect.left = width/2+box_width/2-15-text_rect.width
+                text_rect.left = width/2+418-text_rect.width
                 text_rect.top = 200+index*50
-                temp_width+=text_rect.width
                 screen.blit(text, text_rect)
-                
-                box_width=max(box_width,temp_width+70)
+
             if return_button.draw(screen):
                 seeing_h_scores=False
         else:
@@ -370,6 +379,8 @@ while running:
                         overlap=True
                 if not(overlap):
                     vehicle_group.add(vehicle_car)
+                    alert = vehicle.vehicle(alert_image, lane, 50)
+                    alert_group.add(alert)
                 if(random.randint(0,100)<number_of_lane*speed):
                     add_vehicle = True
         if (pygame.time.get_ticks()-extra_spawn_time)%3000<10 and len(extra_score_group)<1:
@@ -406,6 +417,14 @@ while running:
         #draw extra score
         extra_score_group.draw(screen)
         boost_group.draw(screen)
+        if pygame.time.get_ticks()-alert_time>150 or alert_tick%2==0:
+            alert_group.draw(screen)
+            if pygame.time.get_ticks()-alert_time>150:
+                alert_tick-=1
+                alert_time=pygame.time.get_ticks()
+        for alert in alert_group:
+            if pygame.sprite.spritecollide(alert, vehicle_group, False)or pygame.sprite.spritecollide(alert, extra_score_group, False)or pygame.sprite.spritecollide(alert, boost_group, False):  
+                alert.kill()
         # cho xe cong cong chay
         for vehicle_car in vehicle_group:
             vehicle_car.rect.y += speed 
@@ -413,9 +432,10 @@ while running:
             if vehicle_car.rect.top >= height:
                 vehicle_car.kill()
                 score += 1
-                # tang toc do chay
-                if score > 0 and score % 5 == 0:
-                    speed +=0.3
+        # tang toc do chay
+            if score > score_for_speed_up :
+                score_for_speed_up+=speed
+                speed +=0.5
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
         # draw tree
@@ -465,14 +485,17 @@ while running:
             screen.blit(text_pasue_game,text_pasue_rect)
 
         if gameOver:
-            h_scores.append([player_name,str(score)])
-            h_scores.sort(key=lambda x: int(x[1]), reverse=True)
+            new_score=[player_name, score]
+            h_scores.loc[len(h_scores)]=new_score
+            h_scores.sort_values(["highScore"],axis=0, ascending=[False],inplace=True) 
+            h_scores=h_scores.drop_duplicates(keep='first')
+            h_scores.fillna('', inplace=True)
             boost_status=False
             screen.blit(crash, crash_rect)
             pygame.draw.rect(screen, black, (0, 50, width, 100))
             font = pygame.font.Font(pygame.font.get_default_font(), 40)
             pygame.draw.rect(screen, black, (width/2-195, height/19*5, 390, 190))
-            text_h_score = font.render(f'High Score: {h_scores[0][1]}', True, white)
+            text_h_score = font.render(f'High Score: {h_scores.iloc[[0],[1]].to_string(header=None, index=False)}', True, white)
             text_rect_score= text_h_score.get_rect()
             text_rect_score.center = (width/2, height/3)
             screen.blit(text_h_score, text_rect_score)
@@ -486,8 +509,7 @@ while running:
             text_rect.center = (width/2, 100)
             screen.blit(text, text_rect)
             yes_button.draw(screen)
-            no_button.draw(screen)
-            
+            no_button.draw(screen)            
     
         pygame.display.update()
         
@@ -516,8 +538,9 @@ while running:
             if yes_button.draw(screen):
                 # reset game
                 gameOver = False
+                score_for_speed_up = 4
                 score = 0
-                speed = 3
+                speed = 4
                 vehicle_group.empty()
                 player.rect.center = [player_x, player_y]
             if no_button.draw(screen):
@@ -535,6 +558,7 @@ while running:
                     if event.key == K_y:
                         # reset game
                         gameOver = False
+                        score_for_speed_up = 4
                         score = 0
                         speed = 4
                         vehicle_group.empty()
@@ -545,9 +569,6 @@ while running:
                         playing = False
                         waiting = True
 
-with open('highScore.csv', 'w', newline="") as file:
-    csvwriter = csv.writer(file)
-    csvwriter.writerow(header)
-    csvwriter.writerows(h_scores)
+h_scores.to_csv("highScore.csv",index=False)
 pygame.quit()
 
