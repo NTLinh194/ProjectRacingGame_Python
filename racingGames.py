@@ -33,7 +33,7 @@ for button_number,name in enumerate (select_button_images_name):
     button_temp = button.Button( (width/number_of_button)*(button_number+0.5)-image.get_width()/2*scale,(height-image.get_height()*scale)/3*2, image, scale)
     select_buttons.append(button_temp)
 # load car select menu button images
-select_car_images_name = ['car_1.png','car_2.png','car_3.png','car_4.png','car_5.png','car_6.png','car_7.png','car_8.png']
+select_car_images_name = ['car_1.png','car_2.png','car_3.png','car_4.png','car_5.png','car_6.png','car_7.png']
 number_of_button=len(select_car_images_name)
 select_cars = []
 for button_number,name in enumerate (select_car_images_name):
@@ -75,7 +75,7 @@ boost_image=pygame.image.load('images/boost.png')
 alert_image=pygame.image.load('images/alert.png')
 extra_score_image=pygame.image.load('images/extra_score.png')
 # load xe luu thong
-image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png']
+image_name = ['pickup_truck.png', 'semi_trailer.png', 'taxi.png', 'van.png','canhsat.png','firetruck.png','blackcarvip.png','xecuuthuong.png','publiccar1.png','publiccar2.png','publiccar3.png','red_car.png']
 vehicle_images = []
 for name in image_name:
     image = pygame.image.load('images/' + name)
