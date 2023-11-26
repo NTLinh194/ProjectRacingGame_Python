@@ -440,7 +440,7 @@ while running:
                 score += 1
         # tang toc do chay
         if score > score_for_speed_up :
-            score_for_speed_up+=speed
+            score_for_speed_up+=(speed-3) if boost_status else speed
             speed +=0.5
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
