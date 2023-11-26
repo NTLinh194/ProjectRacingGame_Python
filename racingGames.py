@@ -162,6 +162,9 @@ while running:
     seeing_h_scores = False
     #vòng lặp menu bắt đầu
     while waiting:
+        if pygame.mouse.get_pressed()[0] == 1:
+            button.Button.mouse_holding=True
+        clock.tick(fps)
         for event in pygame.event.get():
             if event.type == QUIT:
                 waiting = False
@@ -184,7 +187,6 @@ while running:
                         player_name = ''
                     elif len(player_name)<20:
                         player_name += event.unicode
-        clock.tick(fps)
         # ve dia hinh co
         screen.fill(green)
         # ve road 
@@ -310,7 +312,11 @@ while running:
         pygame.display.update()
     # vong lap xu ly game
     while playing:
+        #kiểm tra chuột có đang giữ không
+        if pygame.mouse.get_pressed()[0] == 1:
+            button.Button.mouse_holding=True
         # chinh frame hinh tren giay
+        clock.tick(fps)
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
@@ -509,7 +515,9 @@ while running:
             text_rect.center = (width/2, 100)
             screen.blit(text, text_rect)
             yes_button.draw(screen)
-            no_button.draw(screen)            
+            no_button.draw(screen)  
+            reset_game = False
+            return_to_menu = False          
     
         pygame.display.update()
         
@@ -523,7 +531,9 @@ while running:
                 playing = False
                 waiting = True
                 not_pause=True 
-                
+            #kiểm tra chuột có đang giữ không
+            if pygame.mouse.get_pressed()[0] == 1:
+                button.Button.mouse_holding=True
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
@@ -532,20 +542,30 @@ while running:
                     not_pause=True
 
         while gameOver:
+            #kiểm tra chuột có đang giữ không
             clock.tick(fps)
             #nút yes
-            if yes_button.draw(screen):
+            if reset_game:
                 # reset game
                 gameOver = False
                 score_for_speed_up = 4
                 score = 0
                 speed = 4
                 vehicle_group.empty()
+                extra_score_group.empty()
+                boost_group.empty()
+                alert_group.empty()
                 player.rect.center = [player_x, player_y]
-            if no_button.draw(screen):
+            if return_to_menu:
                 gameOver = False
                 playing = False
                 waiting = True
+            if yes_button.draw(screen):
+                reset_game = True
+            if no_button.draw(screen):
+                return_to_menu = True
+            if pygame.mouse.get_pressed()[0] == 1:
+                button.Button.mouse_holding=True
             for event in pygame.event.get():
                 if event.type == QUIT:
                     gameOver = False
@@ -555,18 +575,10 @@ while running:
                 # dieu khien xe
                 if event.type == KEYDOWN:
                     if event.key == K_y:
-                        # reset game
-                        gameOver = False
-                        score_for_speed_up = 4
-                        score = 0
-                        speed = 4
-                        vehicle_group.empty()
-                        player.rect.center = [player_x, player_y]
+                        reset_game = True
                     elif event.key == K_n:
                         # exit game
-                        gameOver = False
-                        playing = False
-                        waiting = True
+                        return_to_menu = True
 
 h_scores.to_csv("highScore.csv",index=False)
 pygame.quit()
