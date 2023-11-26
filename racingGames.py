@@ -246,20 +246,20 @@ while running:
                     selecting_car = False
         #xem điểm high score
         elif seeing_h_scores:
-            pygame.draw.rect(screen, black, (width/2-233, 60, 666, 440))
+            pygame.draw.rect(screen, black, (width/2-233, height*0.2-50, 666, 440))
             text = input_font.render(f'HIGH SCORES', True, white)
             text_rect = text.get_rect()
-            text_rect.center = (width/2+100, 100)
+            text_rect.center = (width/2+100, height*0.2-15)
             screen.blit(text, text_rect)
             text = input_font.render(f'Name', True, white)
             text_rect = text.get_rect()
             text_rect.left = width/2-218
-            text_rect.top = 150
+            text_rect.top = height*0.2+20
             screen.blit(text, text_rect)
             text = input_font.render(f'Score', True, white)
             text_rect = text.get_rect()
             text_rect.left = width/2+418-text_rect.width
-            text_rect.top = 150
+            text_rect.top = height*0.2+20
             screen.blit(text, text_rect)
             if your_button.draw(screen):
                 score_list=h_scores.loc[h_scores['name'] == player_name]
@@ -270,13 +270,13 @@ while running:
                 text = input_font.render(f'{score_list.iloc[[index],[0]].to_string(header=None, index=False)}', True, white)
                 text_rect = text.get_rect()
                 text_rect.left = width/2-218
-                text_rect.top = 200+index*50
+                text_rect.top = height*0.2+70+index*50
                 screen.blit(text, text_rect)
                 #diem so
                 text = input_font.render(f'{score_list.iloc[[index],[1]].to_string(header=None, index=False)}', True, white)
                 text_rect = text.get_rect()
                 text_rect.left = width/2+418-text_rect.width
-                text_rect.top = 200+index*50
+                text_rect.top = height*0.2+70+index*50
                 screen.blit(text, text_rect)
 
             if return_button.draw(screen):
