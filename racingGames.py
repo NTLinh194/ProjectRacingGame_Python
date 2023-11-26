@@ -91,8 +91,6 @@ for i in tree_images_name:
     trees_image.append(image)
 # khoi tao bien
 car_name='car_1.png'
-score = 0
-score_for_speed_up = 4
 # Read CSV
 h_scores = pd.read_csv('highScore.csv', usecols=['name', 'highScore'])
 h_scores=h_scores.drop_duplicates(keep='first')
@@ -119,7 +117,9 @@ player_name = ''
 
 while running:
     # duong xe chay
+    score = 0
     speed = 4
+    score_for_speed_up = 4
     boost_status=False
     road_width = number_of_lane*100
     street_width = 10
