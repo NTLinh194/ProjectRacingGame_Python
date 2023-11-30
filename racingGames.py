@@ -16,7 +16,7 @@ white = (255, 255, 255)
 black = (0,0,0)
 # tao cửa sổ
 width= 900
-height = 650
+height = 750
 screen_size = (width, height)
 screen = pygame.display.set_mode(screen_size)
 # full màn hình
@@ -136,7 +136,7 @@ while running:
     right_edge = (lanes[-1]+45, 0, street_width, height)
     # vi tri ban dau xe ng choi
     player_x = lanes[int((number_of_lane-1)/2)]
-    player_y = height/5*4
+    player_y = height/4.5*4
     # vi tri cay
     tree_left_edge_min=min(0,lanes[0]-100)
     tree_left_edge_max=max(0,lanes[0]-100)
@@ -201,7 +201,7 @@ while running:
             for lane in range(number_of_lane-1) : 
                 pygame.draw.rect(screen, white, (lanes[lane] + 45, y + lane_move_y, street_width, street_height))
         # draw tree
-        if len(tree_group) < 25:
+        if len(tree_group) < 10:
             add_tree = True
             for i in tree_group:
                 if i.rect.top < i.rect.height * (random.uniform(0.2,0.5)):
@@ -378,7 +378,7 @@ while running:
                 lane = lanes[vehicle_lanes[0]]
                 vehicle_lanes.pop(0)
                 image = random.choice(vehicle_images)
-                vehicle_car = vehicle.vehicle(image, lane, height / -2)
+                vehicle_car = vehicle.vehicle(image, lane, height*0.13*-speed)
                 overlap=False
                 for extra_score in extra_score_group:
                     if pygame.sprite.collide_rect(vehicle_car,extra_score):
@@ -441,7 +441,7 @@ while running:
         # tang toc do chay
         if score > score_for_speed_up :
             score_for_speed_up+=(speed-3) if boost_status else speed
-            speed +=0.5
+            speed +=0.3
         # ve nhom xe luu thong
         vehicle_group.draw(screen)
         # draw tree
